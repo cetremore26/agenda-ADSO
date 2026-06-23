@@ -1,4 +1,4 @@
-# Logs
+# Registros (logs)
 logs
 *.log
 npm-debug.log*
@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Carpetas y archivos propios del editor (configuración local, no se versiona)
 .vscode/*
 !.vscode/extensions.json
 .idea

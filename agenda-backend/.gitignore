@@ -1,5 +1,5 @@
 node_modules
-# Keep environment variables out of version control
+# Mantiene las variables de entorno (credenciales, URLs) fuera del control de versiones
 .env
 
 /generated/prisma
