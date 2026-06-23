@@ -1,0 +1,22 @@
+// Qué base de datos usaremos
+datasource db {
+  provider = "mysql"
+}
+
+// Cliente de Prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+// TABLA: Contactos
+model Contacto {
+  id      Int     @id @default(autoincrement())  // ID automático
+  nombre  String                                  // Texto
+  telefono String                                 // Texto
+  correo  String                                  // Texto
+  etiqueta String                                 // Texto
+  empresa String                                  // Texto
+  
+  createdAt DateTime @default(now())             // Fecha de creación
+  updatedAt DateTime @updatedAt                  // Fecha de actualización
+}
