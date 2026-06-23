@@ -131,8 +131,11 @@ export default function FormularioContacto({
         await onActualizar(contactoEditando.id, form);
         onCancelarEdicion();
       } else {
+        // Pausa artificial de 3 segundos: simula una conexión lenta para
+        // poder ver/probar el estado "Guardando..." del botón antes de
+        // que termine la petición real. No es necesaria en producción.
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         // Modo creación: llamamos a la función que llega por props para guardar el contacto
-        await new Promise((resolve) => setTimeout(resolve, 3000)); // pausa de 3 segundos
         await onAgregar(form);
 
         // Si todo fue exitoso, limpiamos los campos del formulario y los errores

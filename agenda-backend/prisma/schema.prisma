@@ -1,22 +1,32 @@
-// Qué base de datos usaremos
+// Archivo de configuración de Prisma (el ORM usado en el backend).
+// Aquí se define: a qué motor de base de datos nos conectamos, qué
+// cliente generar, y la forma de las tablas (modelos) de la app.
+// La URL real de conexión NO se escribe aquí: se lee de la variable
+// de entorno DATABASE_URL (ver .env), por seguridad.
+
+// Qué base de datos usaremos: MySQL/MariaDB
 datasource db {
   provider = "mysql"
 }
 
-// Cliente de Prisma
+// Genera el cliente de Prisma (carpeta @prisma/client) que se usa en
+// src/config/prisma.js para hacer consultas tipadas a la base de datos
 generator client {
   provider = "prisma-client-js"
 }
 
 // TABLA: Contactos
+// Cada "model" se traduce en una tabla de la base de datos. Prisma usa
+// este modelo para generar las migraciones SQL y los métodos
+// prisma.contacto.findMany/create/update/delete que usan los controladores.
 model Contacto {
-  id      Int     @id @default(autoincrement())  // ID automático
-  nombre  String                                  // Texto
-  telefono String                                 // Texto
-  correo  String                                  // Texto
-  etiqueta String                                 // Texto
-  empresa String                                  // Texto
-  
-  createdAt DateTime @default(now())             // Fecha de creación
-  updatedAt DateTime @updatedAt                  // Fecha de actualización
+  id      Int     @id @default(autoincrement())  // Llave primaria, se autoincrementa
+  nombre  String                                  // Nombre del contacto
+  telefono String                                 // Número de teléfono
+  correo  String                                  // Correo electrónico
+  etiqueta String                                 // Categoría: familia, trabajo, amigos...
+  empresa String                                  // Empresa asociada al contacto
+
+  createdAt DateTime @default(now())             // Se asigna automáticamente al crear el registro
+  updatedAt DateTime @updatedAt                  // Prisma la actualiza solo cada vez que se modifica el registro
 }
