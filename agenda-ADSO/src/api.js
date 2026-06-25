@@ -1,49 +1,81 @@
-// Punto base de la API local (ajusta el puerto si usas otro)
+// Capa de servicios: aquí viven todas las llamadas fetch al backend.
 const API = "http://localhost:3001/contactos";
 
-// GET: listar contactos
+const AUTH_API = "http://localhost:3001/auth";
+
+// Error personalizado para distinguir "token expirado" de otros fallos.
+export class SesionExpiradaError extends Error {}
+
+// Construye el header Authorization con el token guardado en localStorage.
+function authHeaders() {
+  const token = localStorage.getItem("token");
+
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+// Revisa la respuesta: 401 = sesión expirada, !ok = error genérico.
+function manejarRespuesta(res, mensajeError) {
+  if (res.status === 401) throw new SesionExpiradaError("Sesión expirada");
+
+  if (!res.ok) throw new Error(mensajeError);
+}
+
+// GET /contactos
 export async function listarContactos() {
-  // Hacemos un GET a /contactos
-  const res = await fetch(API);
-  // Si la respuesta no es OK (>=400), lanzamos error
-  if (!res.ok) throw new Error("Error al listar contactos");
-  // Parseamos JSON y lo retornamos (array de contactos)
+  const res = await fetch(API, { headers: authHeaders() });
+
+  manejarRespuesta(res, "Error al listar contactos");
+
   return res.json();
 }
 
-// POST: crear contacto
+// POST /contactos
 export async function crearContacto(data) {
-  // Hacemos un POST a /contactos con body en JSON
   const res = await fetch(API, {
     method: "POST",
-    headers: { "Content-Type": "application/json" }, // Indicamos JSON
-    body: JSON.stringify(data), // Enviamos el objeto del formulario
-  });
-  // Validamos respuesta
-  if (!res.ok) throw new Error("Error al crear el contacto");
-  // Devolvemos el contacto creado que regresa la API (con id)
-  return res.json();
-}
-
-// PUT: actualizar contacto por id
-export async function actualizarContacto(id, data) {
-  // Hacemos un PUT a /contactos/:id con los campos actualizados
-  const res = await fetch(`${API}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Error al actualizar el contacto");
-  // Devolvemos el contacto actualizado que regresa la API
+
+  manejarRespuesta(res, "Error al crear el contacto");
+
   return res.json();
 }
 
-// DELETE: eliminar contacto por id
+// PUT /contactos/:id
+export async function actualizarContacto(id, data) {
+  const res = await fetch(`${API}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify(data),
+  });
+
+  manejarRespuesta(res, "Error al actualizar el contacto");
+
+  return res.json();
+}
+
+// DELETE /contactos/:id
 export async function eliminarContactoPorId(id) {
-  // Hacemos un DELETE a /contactos/:id
-  const res = await fetch(`${API}/${id}`, { method: "DELETE" });
-  // Validamos respuesta
-  if (!res.ok) throw new Error("Error al eliminar el contacto");
-  // Devolvemos true indicando éxito
+  const res = await fetch(`${API}/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+
+  manejarRespuesta(res, "Error al eliminar el contacto");
+
   return true;
+}
+
+// POST /auth/login
+export async function login(email, password) {
+  const res = await fetch(`${AUTH_API}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) throw new Error("Credenciales inválidas");
+
+  return res.json();
 }
